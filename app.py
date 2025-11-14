@@ -1,9 +1,11 @@
 import os
-import yaml
-import random
-from dotenv import load_dotenv
+from typing import cast
+
 import streamlit as st
+import yaml
+from dotenv import load_dotenv
 from openai import OpenAI
+from openai.types.chat import ChatCompletionMessageParam
 
 # --------------------
 # ページ設定（最初に設定する必要がある）
@@ -38,7 +40,7 @@ client = (
 # --------------------
 st.markdown(
     """
-    <div style="text-align:center; padding: 24px; border-radius: 20px; 
+    <div style="text-align:center; padding: 24px; border-radius: 20px;
                 background: #F5F5F5;  /* 単色の淡いグレー */
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
                 margin-bottom: 20px;
@@ -148,7 +150,7 @@ avatar = sel.get("avatar")
 if not st.session_state.messages:
     st.markdown(
         """
-        <div style="text-align: center; padding: 40px; 
+        <div style="text-align: center; padding: 40px;
                     background: linear-gradient(135deg, #FFF8DC, #FFE4E1, #E0FFFF);
                     border-radius: 20px; margin: 20px 0;
                     border: 2px dashed #FFB6C1;">
@@ -185,10 +187,19 @@ if prompt := st.chat_input("話しかけてみよう..."):
     with st.chat_message("assistant", avatar=avatar):
         try:
             with st.spinner("考え中..."):
+                # メッセージリストを正しい型でキャスト
+                system_message: ChatCompletionMessageParam = {
+                    "role": "system",
+                    "content": SYSTEM_PROMPT,
+                }
+                user_messages = cast(
+                    list[ChatCompletionMessageParam], st.session_state.messages
+                )
+                all_messages = [system_message] + user_messages
+
                 response = client.chat.completions.create(
                     model=MODEL,
-                    messages=[{"role": "system", "content": SYSTEM_PROMPT}]
-                    + st.session_state.messages,
+                    messages=all_messages,
                     temperature=temperature,
                     max_tokens=max_tokens,
                 )
