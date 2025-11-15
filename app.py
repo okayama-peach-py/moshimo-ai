@@ -12,7 +12,7 @@ from openai.types.chat import ChatCompletionMessageParam
 # --------------------
 st.set_page_config(
     page_title="もしもAI",
-    page_icon="🎭",
+    page_icon="🎀",
     layout="centered",
 )
 
@@ -46,7 +46,7 @@ st.markdown(
                 margin-bottom: 20px;
                 border: 1px solid #D3D3D3;">
       <h1 style="margin:0; color: #333333; text-shadow: none; font-size: 2em;">
-        もしもAI 🎭✨
+        もしもAI 🎀✨
       </h1>
       <p style="margin: 12px 0 0; color: #666666; font-size: 1em; font-weight: 500;">
         もしも◯◯が話せたら？を、LLMでカタチに。
@@ -74,7 +74,7 @@ with st.sidebar:
         <div style="background: #F8F8F8;  /* 単色の淡いグレー */
                     padding: 15px; border-radius: 15px; margin-bottom: 20px;
                     border: 1px solid #D3D3D3;">
-            <h2 style="color: #333333; text-align: center; margin: 0; font-size: 1.5em;">
+            <h2 style="color: #333333; text-align: center; margin: 0; font-size: 1.1em;">
                 🎭 キャラクター選択 ✨
             </h2>
         </div>
@@ -92,7 +92,7 @@ with st.sidebar:
         <div style="background: #F8F8F8;  /* 単色の淡いグレー */
                     padding: 15px; border-radius: 15px; margin: 15px 0;
                     border: 1px solid #D3D3D3;">
-            <h3 style="color: #333333; text-align: center; margin: 0; font-size: 1.2em;">
+            <h3 style="color: #333333; text-align: center; margin: 0; font-size: 1.0em;">
                 ⚙️ 出力スタイル設定 🎨
             </h3>
         </div>
@@ -112,12 +112,10 @@ with st.sidebar:
         msg_count = len(st.session_state.messages)
         st.caption(f"💬 会話数: {msg_count // 2}回")
 
-    # リセットボタンを特別にスタイリング
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("🔄 会話リセット", type="primary"):
-            st.session_state.messages = []
-            st.rerun()
+    # リセットボタン
+    if st.button("🔄 会話リセット", type="primary", use_container_width=True):
+        st.session_state.messages = []
+        st.rerun()
 
 # --------------------
 # セッション初期化
@@ -144,10 +142,12 @@ SYSTEM_PROMPT = f"""
 # --------------------
 # 既存メッセージ描画
 # --------------------
+# 元の画像avatarを使用
 avatar = sel.get("avatar")
 
 # メッセージがない場合の初期表示
 if not st.session_state.messages:
+    char_emoji = sel.get("emoji", "🎭")
     st.markdown(
         """
         <div style="text-align: center; padding: 40px;
@@ -155,14 +155,14 @@ if not st.session_state.messages:
                     border-radius: 20px; margin: 20px 0;
                     border: 2px dashed #FFB6C1;">
             <h3 style="color: #FF6347; margin-bottom: 20px;">
-                🎭 {} との会話を始めよう！ ✨
+                {} {} との会話を始めよう！ ✨
             </h3>
             <p style="color: #4682B4; font-size: 1.1em;">
                 下のチャット欄から気軽に話しかけてください 🌈
             </p>
         </div>
         """.format(
-            sel["name"]
+            char_emoji, sel["name"]
         ),
         unsafe_allow_html=True,
     )
